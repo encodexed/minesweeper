@@ -1,18 +1,16 @@
-## Getting Started
+# Minesweeper for the Java CLI
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+Rules can be found <a href="https://minesweepergame.com/strategy/how-to-play-minesweeper.php">here</a>.
 
-## Folder Structure
+This code is designed to be run in command line interface and you will be prompted to enter a command each turn.
 
-The workspace contains two folders by default, where:
+## Commands
 
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
+Here are the accepted command patterns:
 
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
-
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
-
-## Dependency Management
-
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+- `new` : Begins a new game.
+- `quit` : Quits the application.
+- `help` : Displays the available list of commands.
+- `a9` : Opens the cell at coordinate A9
+- `!c3` : Flags the cell at coordinate C3
+- `time` : Displays the current time taken
