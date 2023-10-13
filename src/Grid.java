@@ -153,11 +153,11 @@ public class Grid {
   }
 
   public int getWidth() {
-    return this.height;
+    return this.width;
   }
 
   public int getMines() {
-    return this.height;
+    return this.mines;
   }
 
   public int getMaxMines() {
