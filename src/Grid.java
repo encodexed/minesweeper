@@ -1,20 +1,26 @@
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 
 public class Grid {
 
   // Metadata
+  private Date timeStarted;
+  private boolean isFirstTurn;
+  private int flagsPlaced;
+  private int minesFound;
+
   private int height;
-  private final int minHeight = 10;
-  private final int maxHeight = 26;
+  private final int MIN_HEIGHT = 10;
+  private final int MAX_HEIGHT = 26;
 
   private int width;
-  private final int minWidth = 10;
-  private final int maxWidth = 26;
+  private final int MIN_WIDTH = 10;
+  private final int MAX_WIDTH = 26;
 
   private int mines;
-  private final int minMines = 10;
+  private final int MIN_MINES = 10;
   private int maxMines;
 
   // Content
@@ -22,6 +28,10 @@ public class Grid {
 
   // Constructor
   public Grid(int height, int width, int mines) throws OutOfBoundsError, Exception {
+    this.timeStarted = new Date();
+    this.isFirstTurn = true;
+    this.flagsPlaced = 0;
+    this.minesFound = 0;
     setHeight(height);
     setWidth(width);
     this.maxMines = (width - 1) * (height - 1);
@@ -92,10 +102,8 @@ public class Grid {
     // Convert int[] into int[][] of valid coordinates
     int[][] mineLocations = new int[mines][2];
     for (int i = 0; i < mines; i++) {
-      int xLocation = rawLocationsArray[i] / height;
-      int yLocation = rawLocationsArray[i] % height;
-      mineLocations[i][0] = xLocation;
-      mineLocations[i][1] = yLocation;
+      mineLocations[i][0] = rawLocationsArray[i] / height;
+      mineLocations[i][1] = rawLocationsArray[i] % height;
     }
 
     return mineLocations;
@@ -124,6 +132,22 @@ public class Grid {
   }
 
   // Getters
+  public Date getTimeStarted() {
+    return this.timeStarted;
+  }
+
+  public boolean isFirstTurn() {
+    return this.isFirstTurn;
+  }
+
+  public int getFlagsPlaced() {
+    return this.flagsPlaced;
+  }
+
+  public int getMinesFound() {
+    return this.minesFound;
+  }
+
   public int getHeight() {
     return this.height;
   }
@@ -137,16 +161,16 @@ public class Grid {
   }
 
   public int getMaxMines() {
-    return maxMines;
+    return this.maxMines;
   }
 
   // Setters
   public void setHeight(int height) throws OutOfBoundsError {
-    if (height > this.maxHeight) {
+    if (height > this.MAX_HEIGHT) {
       throw new OutOfBoundsError("Given height was more than the maximum allowed height");
     }
 
-    if (height < this.minHeight) {
+    if (height < this.MIN_HEIGHT) {
       throw new OutOfBoundsError("Given height was less than the minimum allowed height");
     }
 
@@ -154,11 +178,11 @@ public class Grid {
   }
 
   public void setWidth(int width) throws OutOfBoundsError {
-    if (width > this.maxWidth) {
+    if (width > this.MAX_WIDTH) {
       throw new OutOfBoundsError("Given width was more than the maximum allowed width");
     }
 
-    if (width < this.minWidth) {
+    if (width < this.MIN_WIDTH) {
       throw new OutOfBoundsError("Given width was less than the minimum allowed width");
     }
 
@@ -170,7 +194,7 @@ public class Grid {
       throw new Exception("Given mines was more than the maximum allowed mines");
     }
 
-    if (mines < this.minMines) {
+    if (mines < this.MIN_MINES) {
       throw new Exception("Given mines was more than the maximum allowed mines");
     }
 
