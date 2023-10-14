@@ -1,14 +1,16 @@
 public class Tile {
 
-  private Coordinate coordinates;
+  private int coordinateX;
+  private int coordinateY;
   private TileType tileType;
   private int nearbyMines;
   private boolean isRevealed;
   private boolean isFlagged;
   private String displayedValue;
 
-  public Tile(Coordinate coordinates, TileType tileType) {
-    this.coordinates = coordinates;
+  public Tile(int coordinateX, int coordinateY, TileType tileType) {
+    this.coordinateX = coordinateX;
+    this.coordinateY = coordinateY;
     this.tileType = tileType;
     this.nearbyMines = -1;
     this.isRevealed = false;
@@ -18,8 +20,12 @@ public class Tile {
 
   // Getters
 
-  public Coordinate getCoordinates() {
-    return coordinates;
+  public int getCoordinateX() {
+    return coordinateX;
+  }
+
+  public int getCoordinateY() {
+    return coordinateY;
   }
 
   public int getNearbyMines() {
@@ -44,8 +50,12 @@ public class Tile {
 
   // Setters
 
-  public void setCoordinates(Coordinate coordinates) {
-    this.coordinates = coordinates;
+  public void setCoordinateX(int coordinateX) {
+    this.coordinateX = coordinateX;
+  }
+
+  public void setCoordinateY(int coordinateY) {
+    this.coordinateY = coordinateY;
   }
 
   public void setTileType(TileType tileType) {

@@ -54,24 +54,14 @@ public class Grid {
     for (int i = 0; i < mineLocations.length; i++) {
       int xLocation = mineLocations[i][0];
       int yLocation = mineLocations[i][1];
-      try {
-        Coordinate mineCoordinates = new Coordinate(xLocation, yLocation, this.width, this.height);
-        grid[xLocation][yLocation] = new Tile(mineCoordinates, TileType.MINE);
-      } catch (Exception e) {
-        System.out.println(e);
-      }
+      grid[xLocation][yLocation] = new Tile(xLocation, yLocation, TileType.MINE);
     }
 
     // Add safe tiles to the rest of the grid
     for (int i = 0; i < width; i++) {
       for (int j = 0; j < height; j++) {
         if (grid[i][j] == null) {
-          try {
-            Coordinate safeCoordinates = new Coordinate(i, j, this.width, this.height);
-            grid[i][j] = new Tile(safeCoordinates, TileType.SAFE);
-          } catch (Exception e) {
-            System.out.println(e);
-          }
+          grid[i][j] = new Tile(i, j, TileType.SAFE);
         }
       }
     }
