@@ -8,6 +8,7 @@ public class Grid {
   // Metadata
   private Date timeStarted;
   private boolean isFirstTurn;
+  private boolean isRunning;
   private int flagsPlaced;
   private int minesFound;
 
@@ -28,10 +29,11 @@ public class Grid {
 
   // Constructor
   public Grid(int height, int width, int mines) throws OutOfBoundsError, Exception {
-    this.timeStarted = new Date();
+    this.timeStarted = null;
     this.isFirstTurn = true;
     this.flagsPlaced = 0;
     this.minesFound = 0;
+    this.isRunning = true;
     setHeight(height);
     setWidth(width);
     this.maxMines = (width - 1) * (height - 1);
@@ -115,7 +117,7 @@ public class Grid {
     for (int i = 0; i < this.height; i++) {
       System.out.print(String.format("[%d] ", i));
       for (int j = 0; j < this.width; j++) {
-        System.out.print(this.tiles[j][i].displayTile() + " ");
+        System.out.print(this.tiles[j][i].getDisplayedValue() + " ");
       }
       System.out.print(String.format("[%d] \n", i));
     }
@@ -148,6 +150,10 @@ public class Grid {
     return this.minesFound;
   }
 
+  public boolean isRunning() {
+    return isRunning;
+  }
+
   public int getHeight() {
     return this.height;
   }
@@ -164,7 +170,27 @@ public class Grid {
     return this.maxMines;
   }
 
+  public Tile getTileAt(int x, int y) {
+    // TODO: Make sure tile is within range, else it will throw an error
+    return this.tiles[x][y];
+  }
+
   // Setters
+  public void setFirstTurn(boolean isFirstTurn) {
+    this.isFirstTurn = isFirstTurn;
+  }
+
+  public void startTimer() {
+    this.timeStarted = new Date();
+  }
+
+  public void setIsRunning(boolean isRunning) {
+    this.isRunning = isRunning;
+    if (!isRunning) {
+      revealAllTiles();
+    }
+  }
+
   public void setHeight(int height) throws OutOfBoundsError {
     if (height > this.MAX_HEIGHT) {
       throw new OutOfBoundsError("Given height was more than the maximum allowed height");
@@ -199,5 +225,16 @@ public class Grid {
     }
 
     this.mines = mines;
+  }
+
+  private void revealAllTiles() {
+    System.out.println("this.width: " + this.width);
+    System.out.println("this.height: " + this.height);
+    for (int i = 0; i < this.width; i++) {
+      for (int j = 0; j < this.height; j++) {
+        System.out.println(String.format("End game: Revealing: (%d, %d)", i, j));
+        this.tiles[i][j].setRevealed(true, this.isRunning);
+      }
+    }
   }
 }

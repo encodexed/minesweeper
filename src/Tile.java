@@ -5,6 +5,7 @@ public class Tile {
   private int nearbyMines;
   private boolean isRevealed;
   private boolean isFlagged;
+  private String displayedValue;
 
   public Tile(Coordinate coordinates, TileType tileType) {
     this.coordinates = coordinates;
@@ -12,20 +13,7 @@ public class Tile {
     this.nearbyMines = -1;
     this.isRevealed = false;
     this.isFlagged = false;
-  }
-
-  public String displayTile() {
-    String value = "-";
-
-    if (this.isRevealed) {
-      if (this.tileType == TileType.SAFE) {
-        value = " ";
-      } else {
-        value = "*";
-      }
-    }
-
-    return String.format("[%s]", value);
+    this.displayedValue = "_";
   }
 
   // Getters
@@ -50,6 +38,10 @@ public class Tile {
     return isRevealed;
   }
 
+  public String getDisplayedValue() {
+    return "[" + displayedValue + "]";
+  }
+
   // Setters
 
   public void setCoordinates(Coordinate coordinates) {
@@ -64,11 +56,25 @@ public class Tile {
     this.nearbyMines = nearbyMines;
   }
 
-  public void setRevealed(boolean isRevealed) {
+  public void setRevealed(boolean isRevealed, boolean isRunning) {
     this.isRevealed = isRevealed;
+    if (isRevealed && isRunning) {
+      setDisplayedValue(this.nearbyMines + "");
+    } else if (isRevealed && !isRunning) {
+      if (this.tileType == TileType.MINE) {
+        setDisplayedValue("*");
+      } else {
+        // TODO: Display nearby mine count
+        setDisplayedValue("-");
+      }
+    }
   }
 
   public void setFlagged(boolean isFlagged) {
     this.isFlagged = isFlagged;
+  }
+
+  public void setDisplayedValue(String displayedValue) {
+    this.displayedValue = displayedValue;
   }
 }
