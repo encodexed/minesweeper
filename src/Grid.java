@@ -118,7 +118,7 @@ public class Grid {
   public void printXReference() {
     System.out.print("[+] ");
     for (int i = 0; i < this.width; i++) {
-      System.out.print(String.format("[%d] ", i));
+      System.out.print(String.format("[%c] ", i + 65));
     }
     System.out.print("[+] \n");
   }
