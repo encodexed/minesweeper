@@ -74,8 +74,12 @@ public class Tile {
       if (this.tileType == TileType.MINE) {
         setDisplayedValue("*");
       } else {
-        // TODO: Display nearby mine count
-        setDisplayedValue("-");
+        if (this.nearbyMines != 0) {
+          setDisplayedValue(this.nearbyMines + "");
+        } else {
+          setDisplayedValue("-");
+        }
+
       }
     }
   }

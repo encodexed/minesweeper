@@ -39,6 +39,7 @@ public class Grid {
     this.maxMines = (width - 1) * (height - 1);
     setMines(mines);
     this.tiles = generateGrid(width, height, mines);
+    calculateAllNearbyMines();
   }
 
   private Tile[][] generateGrid(int width, int height, int mines) {
@@ -99,6 +100,68 @@ public class Grid {
     }
 
     return mineLocations;
+  }
+
+  private void calculateAllNearbyMines() {
+    for (int i = 0; i < this.width; i++) {
+      for (int j = 0; j < this.height; j++) {
+        this.tiles[i][j].setNearbyMines(calculateNearbyMines(i, j));
+      }
+    }
+  }
+
+  private int calculateNearbyMines(int xLoc, int yLoc) {
+    int mineCounter = 0;
+    // top left
+    xLoc -= 1;
+    yLoc -= 1;
+    mineCounter += this.checkForMine(xLoc, yLoc);
+    // top
+    xLoc += 1;
+    mineCounter += this.checkForMine(xLoc, yLoc);
+    // top right
+    xLoc += 1;
+    mineCounter += this.checkForMine(xLoc, yLoc);
+    // right
+    yLoc += 1;
+    mineCounter += this.checkForMine(xLoc, yLoc);
+    // bottom right
+    yLoc += 1;
+    mineCounter += this.checkForMine(xLoc, yLoc);
+    // bottom
+    xLoc -= 1;
+    mineCounter += this.checkForMine(xLoc, yLoc);
+    // bottom left
+    xLoc -= 1;
+    mineCounter += this.checkForMine(xLoc, yLoc);
+    // left
+    yLoc -= 1;
+    mineCounter += this.checkForMine(xLoc, yLoc);
+
+    return mineCounter;
+  }
+
+  private int checkForMine(int xLoc, int yLoc) {
+    boolean exists = validateCoordinates(xLoc, yLoc);
+    if (exists) {
+      if (this.getTileAt(xLoc, yLoc).getTileType() == TileType.MINE) {
+        return 1;
+      }
+    }
+
+    return 0;
+  }
+
+  private boolean validateCoordinates(int x, int y) {
+    if (x < 0 || x > this.width - 1) {
+      return false;
+    }
+
+    if (y < 0 || y > this.height - 1) {
+      return false;
+    }
+
+    return true;
   }
 
   public void printGrid() {
