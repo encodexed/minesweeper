@@ -146,9 +146,7 @@ public class Grid {
   }
 
   private int checkForMine(int xLoc, int yLoc) throws OutOfBoundsError {
-    if (!validateCoordinates(xLoc, yLoc)) {
-      throw new OutOfBoundsError("One or both of the coordinates is out of bounds");
-    } else {
+    if (validateCoordinates(xLoc, yLoc)) {
       if (this.getTileAt(xLoc, yLoc).getTileType() == TileType.MINE) {
         return 1;
       }
@@ -228,12 +226,8 @@ public class Grid {
     return this.maxMines;
   }
 
-  public Tile getTileAt(int x, int y) throws OutOfBoundsError {
-    if (!validateCoordinates(x, y)) {
-      throw new OutOfBoundsError("One or both of the given coordinates is out of bounds.");
-    }
-    ;
-
+  // OutOfBoundsError cannot be thrown logically here
+  public Tile getTileAt(int x, int y) {
     return this.tiles[x][y];
   }
 
@@ -294,7 +288,6 @@ public class Grid {
     System.out.println("this.height: " + this.height);
     for (int i = 0; i < this.width; i++) {
       for (int j = 0; j < this.height; j++) {
-        System.out.println(String.format("End game: Revealing: (%d, %d)", i, j));
         this.tiles[i][j].setRevealed(true, this.isRunning);
       }
     }
