@@ -29,23 +29,38 @@ public class CommandUtils {
         return false;
       default:
         boolean validated = validateCoordinatesCommand(command);
+        // if coordinates match regex
         if (validated) {
+          // first turn should be safe
           if (grid.isFirstTurn()) {
-            grid.startTimer();
-            grid.setFirstTurn(false);
-          }
-
-          if (command.charAt(0) == '!') {
-            togglePlacedFlag(command.substring(1), grid);
+            boolean isFirstTurnUnsafe = true;
+            // the board will regenerate if the first turn is unsafe, then retry turn
+            while (isFirstTurnUnsafe) {
+              // attempting the turn
+              if (handleTurn(command, grid)) {
+                // unsafe turn, resetting the grid, looping around again
+                grid.reset();
+              } else {
+                // safe turn, starting timer, ending loop
+                grid.startTimer();
+                grid.setFirstTurn(false);
+                isFirstTurnUnsafe = false;
+              }
+            }
+            return true;
           } else {
-            // Has the potential to end the game
-            return revealTile(command, grid);
+            // every other turn besides the first, this could end the game
+            boolean isGameOver = handleTurn(command, grid);
+            if (isGameOver) {
+              endGame(false, grid);
+            }
+            return true;
           }
         } else {
+          // coords/command didn't match regex
           System.out.println("Invalid command");
+          return true;
         }
-
-        return true;
     }
   }
 
@@ -63,6 +78,9 @@ public class CommandUtils {
   }
 
   private static void printTimeTaken(Grid grid) {
+    if (grid.getTimeStarted() == null) {
+      return;
+    }
     Date now = new Date();
     Date startedAt = grid.getTimeStarted();
     long millisecondsTaken = now.getTime() - startedAt.getTime();
@@ -105,6 +123,7 @@ public class CommandUtils {
     return matcher.matches();
   }
 
+  // Returning true here triggers an end game condition
   private static boolean revealTile(String coordinates, Grid grid) throws OutOfBoundsError {
     int[] coords = convertCoordinatesToIntArray(coordinates);
     Tile targetTile = grid.getTileAt(coords[0], coords[1]);
@@ -113,13 +132,24 @@ public class CommandUtils {
     } else {
       targetTile.setRevealed(true, grid.isRunning());
       if (targetTile.getTileType() == TileType.MINE) {
-        endGame(false, grid);
+        return true;
       } else {
         grid.printGrid();
       }
     }
 
-    return true;
+    return false;
+  }
+
+  // Returning true here ends the game
+  private static boolean handleTurn(String command, Grid grid) throws OutOfBoundsError {
+    if (command.charAt(0) == '!') {
+      togglePlacedFlag(command.substring(1), grid);
+      return false;
+    } else {
+      // Has the potential to end the game
+      return revealTile(command, grid);
+    }
   }
 
   private static void endGame(boolean isOutcomeGood, Grid grid) {

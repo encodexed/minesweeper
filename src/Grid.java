@@ -295,8 +295,6 @@ public class Grid {
   }
 
   private void revealAllTiles() {
-    System.out.println("this.width: " + this.width);
-    System.out.println("this.height: " + this.height);
     for (int i = 0; i < this.width; i++) {
       for (int j = 0; j < this.height; j++) {
         this.tiles[i][j].setRevealed(true, this.isRunning);
