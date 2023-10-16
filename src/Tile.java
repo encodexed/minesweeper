@@ -79,7 +79,6 @@ public class Tile {
         setDisplayedValue("!");
         // if tile has no nearby mines
       } else if (this.nearbyMines == 0) {
-        // TODO: Open up big areas of safety if a 0 is clicked
         setDisplayedValue("~");
         // if tile has nearby mines
       } else {

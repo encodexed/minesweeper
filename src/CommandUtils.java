@@ -34,6 +34,7 @@ public class CommandUtils {
           // first turn should be safe
           if (grid.isFirstTurn()) {
             boolean isFirstTurnUnsafe = true;
+            // TODO: Re-roll until first turn lands on safe (zero) tile
             // the board will regenerate if the first turn is unsafe, then retry turn
             while (isFirstTurnUnsafe) {
               // attempting the turn
@@ -133,6 +134,9 @@ public class CommandUtils {
       targetTile.setRevealed(true, grid.isRunning());
       if (targetTile.getTileType() == TileType.MINE) {
         return true;
+      } else if (targetTile.getDisplayedValue().equals("[~]")) {
+        grid.cascadeSafeReveals(coords[0], coords[1]);
+        grid.printGrid();
       } else {
         grid.printGrid();
       }

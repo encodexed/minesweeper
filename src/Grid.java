@@ -301,4 +301,35 @@ public class Grid {
       }
     }
   }
+
+  public void cascadeSafeReveals(int xLoc, int yLoc) {
+    // top left
+    handleCascade(xLoc - 1, yLoc - 1);
+    // top
+    handleCascade(xLoc, yLoc - 1);
+    // // top right
+    handleCascade(xLoc + 1, yLoc - 1);
+    // // right
+    handleCascade(xLoc + 1, yLoc);
+    // // bottom right
+    handleCascade(xLoc + 1, yLoc + 1);
+    // // bottom
+    handleCascade(xLoc, yLoc + 1);
+    // // bottom left
+    handleCascade(xLoc - 1, yLoc + 1);
+    // // left
+    handleCascade(xLoc - 1, yLoc);
+  }
+
+  private void handleCascade(int xLoc, int yLoc) {
+    if (validateCoordinates(xLoc, yLoc)) {
+      Tile tile = getTileAt(xLoc, yLoc);
+      if (!tile.isRevealed()) {
+        tile.setRevealed(true, this.isRunning);
+        if (tile.getNearbyMines() == 0) {
+          this.cascadeSafeReveals(xLoc, yLoc);
+        }
+      }
+    }
+  }
 }
