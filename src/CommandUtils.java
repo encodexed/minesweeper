@@ -132,9 +132,15 @@ public class CommandUtils {
       System.out.println("That tile is already revealed or flagged!");
     } else {
       targetTile.setRevealed(true, grid.isRunning());
+      if (targetTile.getNearbyMines() > 0 && grid.isFirstTurn()) {
+        return true;
+      }
+
       if (targetTile.getTileType() == TileType.MINE) {
         return true;
-      } else if (targetTile.getDisplayedValue().equals("[~]")) {
+      }
+
+      if (targetTile.getDisplayedValue().equals("[~]")) {
         grid.cascadeSafeReveals(coords[0], coords[1]);
         grid.printGrid();
       } else {

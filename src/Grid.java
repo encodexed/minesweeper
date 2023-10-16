@@ -128,30 +128,21 @@ public class Grid {
   private int calculateNearbyMines(int xLoc, int yLoc) throws OutOfBoundsError {
     int mineCounter = 0;
     // top left
-    xLoc -= 1;
-    yLoc -= 1;
-    mineCounter += this.checkForMine(xLoc, yLoc);
+    mineCounter += this.checkForMine(xLoc - 1, yLoc - 1);
     // top
-    xLoc += 1;
-    mineCounter += this.checkForMine(xLoc, yLoc);
+    mineCounter += this.checkForMine(xLoc, yLoc - 1);
     // top right
-    xLoc += 1;
-    mineCounter += this.checkForMine(xLoc, yLoc);
+    mineCounter += this.checkForMine(xLoc + 1, yLoc - 1);
     // right
-    yLoc += 1;
-    mineCounter += this.checkForMine(xLoc, yLoc);
+    mineCounter += this.checkForMine(xLoc + 1, yLoc);
     // bottom right
-    yLoc += 1;
-    mineCounter += this.checkForMine(xLoc, yLoc);
+    mineCounter += this.checkForMine(xLoc + 1, yLoc + 1);
     // bottom
-    xLoc -= 1;
-    mineCounter += this.checkForMine(xLoc, yLoc);
+    mineCounter += this.checkForMine(xLoc, yLoc + 1);
     // bottom left
-    xLoc -= 1;
-    mineCounter += this.checkForMine(xLoc, yLoc);
+    mineCounter += this.checkForMine(xLoc - 1, yLoc + 1);
     // left
-    yLoc -= 1;
-    mineCounter += this.checkForMine(xLoc, yLoc);
+    mineCounter += this.checkForMine(xLoc - 1, yLoc);
 
     return mineCounter;
   }
