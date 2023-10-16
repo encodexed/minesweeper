@@ -7,7 +7,7 @@ public class CommandUtils {
   public static boolean processCommand(String command, Grid grid) throws OutOfBoundsError, Exception {
     switch (command) {
       case "new":
-        // TODO: This doesn't actually start a new game...
+        grid.reset();
         System.out.println("Starting a new game");
         grid.printGrid();
         return true;

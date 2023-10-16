@@ -46,6 +46,17 @@ public class Grid {
     calculateAllNearbyMines();
   }
 
+  public void reset() throws OutOfBoundsError {
+    this.timeStarted = null;
+    this.isFirstTurn = true;
+    this.flagsPlaced = 0;
+    this.minesFound = 0;
+    this.isRunning = true;
+    this.tiles = null;
+    this.tiles = generateGrid(width, height, mines);
+    calculateAllNearbyMines();
+  }
+
   private Tile[][] generateGrid(int width, int height, int mines) {
 
     // Generate empty grid

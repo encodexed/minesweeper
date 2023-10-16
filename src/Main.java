@@ -5,6 +5,7 @@ public class Main {
     System.out.println("Welcome to Java Minesweeper!");
     Grid grid = new Grid(10, 10, 15);
     CommandUtils.printHelp();
+    grid.printGrid();
     Scanner keyboard = new Scanner(System.in);
     boolean isGameRunning = true;
     while (isGameRunning) {
