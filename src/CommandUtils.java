@@ -76,10 +76,19 @@ public class CommandUtils {
     return String.format("Time taken: %02d:%02d", minutes, secondsLeft);
   }
 
-  private static void togglePlacedFlag(String coordinates, Grid grid) {
+  private static void togglePlacedFlag(String coordinates, Grid grid) throws OutOfBoundsError {
     int[] coords = convertCoordinatesToIntArray(coordinates);
     Tile targetTile = grid.getTileAt(coords[0], coords[1]);
+
+    if (targetTile.isRevealed() && !targetTile.isFlagged()) {
+      System.out.println("You can't flag a revealed tile!");
+      return;
+    }
+
     targetTile.setFlagged(!targetTile.isFlagged());
+    boolean isRevealed = targetTile.isRevealed();
+    targetTile.setRevealed(!isRevealed, true);
+    grid.printGrid();
   }
 
   private static int[] convertCoordinatesToIntArray(String coordinates) {
@@ -93,16 +102,14 @@ public class CommandUtils {
   private static boolean validateCoordinatesCommand(String command) {
     Pattern pattern = Pattern.compile("\\!?[A-Za-z]\\d\\d?", Pattern.CASE_INSENSITIVE);
     Matcher matcher = pattern.matcher(command);
-    return matcher.find();
+    return matcher.matches();
   }
 
-  private static boolean revealTile(String coordinates, Grid grid) {
+  private static boolean revealTile(String coordinates, Grid grid) throws OutOfBoundsError {
     int[] coords = convertCoordinatesToIntArray(coordinates);
-    // TODO: Some coordinate validation can be done here to make sure it exists on
-    // the grid
     Tile targetTile = grid.getTileAt(coords[0], coords[1]);
     if (targetTile.isRevealed()) {
-      System.out.println("That tile is already revealed!");
+      System.out.println("That tile is already revealed or flagged!");
     } else {
       targetTile.setRevealed(true, grid.isRunning());
       if (targetTile.getTileType() == TileType.MINE) {

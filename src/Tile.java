@@ -68,19 +68,37 @@ public class Tile {
 
   public void setRevealed(boolean isRevealed, boolean isRunning) {
     this.isRevealed = isRevealed;
-    if (isRevealed && isRunning) {
-      setDisplayedValue(this.nearbyMines + "");
-    } else if (isRevealed && !isRunning) {
+    determineDisplayedValue(isRunning);
+  }
+
+  public void determineDisplayedValue(boolean isRunning) {
+    // if game is running
+    if (this.isRevealed && isRunning) {
+      // if tile is flagged
+      if (this.isFlagged) {
+        setDisplayedValue("!");
+        // if tile has no nearby mines
+      } else if (this.nearbyMines == 0) {
+        // TODO: Open up big areas of safety if a 0 is clicked
+        setDisplayedValue("~");
+        // if tile has nearby mines
+      } else {
+        setDisplayedValue(this.nearbyMines + "");
+      }
+      // if game is over
+    } else if (this.isRevealed && !isRunning) {
+      // if tile is a mine
       if (this.tileType == TileType.MINE) {
         setDisplayedValue("*");
       } else {
         if (this.nearbyMines != 0) {
           setDisplayedValue(this.nearbyMines + "");
         } else {
-          setDisplayedValue("-");
+          setDisplayedValue("~");
         }
-
       }
+    } else if (!this.isRevealed && isRunning) {
+      setDisplayedValue("_");
     }
   }
 

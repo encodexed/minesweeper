@@ -3,6 +3,10 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 
+// TODO: Add flagged cells to an array of flags
+// TODO: Consider taking in multiple commands at once to speed up game
+// TODO: Double check that flagging all mines and revealing all other tiles wins game
+
 public class Grid {
 
   // Metadata
@@ -102,7 +106,7 @@ public class Grid {
     return mineLocations;
   }
 
-  private void calculateAllNearbyMines() {
+  private void calculateAllNearbyMines() throws OutOfBoundsError {
     for (int i = 0; i < this.width; i++) {
       for (int j = 0; j < this.height; j++) {
         this.tiles[i][j].setNearbyMines(calculateNearbyMines(i, j));
@@ -110,7 +114,7 @@ public class Grid {
     }
   }
 
-  private int calculateNearbyMines(int xLoc, int yLoc) {
+  private int calculateNearbyMines(int xLoc, int yLoc) throws OutOfBoundsError {
     int mineCounter = 0;
     // top left
     xLoc -= 1;
@@ -141,9 +145,10 @@ public class Grid {
     return mineCounter;
   }
 
-  private int checkForMine(int xLoc, int yLoc) {
-    boolean exists = validateCoordinates(xLoc, yLoc);
-    if (exists) {
+  private int checkForMine(int xLoc, int yLoc) throws OutOfBoundsError {
+    if (!validateCoordinates(xLoc, yLoc)) {
+      throw new OutOfBoundsError("One or both of the coordinates is out of bounds");
+    } else {
       if (this.getTileAt(xLoc, yLoc).getTileType() == TileType.MINE) {
         return 1;
       }
@@ -223,8 +228,12 @@ public class Grid {
     return this.maxMines;
   }
 
-  public Tile getTileAt(int x, int y) {
-    // TODO: Make sure tile is within range, else it will throw an error
+  public Tile getTileAt(int x, int y) throws OutOfBoundsError {
+    if (!validateCoordinates(x, y)) {
+      throw new OutOfBoundsError("One or both of the given coordinates is out of bounds.");
+    }
+    ;
+
     return this.tiles[x][y];
   }
 
