@@ -3,18 +3,13 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 
-// TODO: Add flagged cells to an array of flags
-// TODO: Consider taking in multiple commands at once to speed up game
-// TODO: Double check that flagging all mines and revealing all other tiles wins game
-
 public class Grid {
 
   // Metadata
   private Date timeStarted;
   private boolean isFirstTurn;
   private boolean isRunning;
-  private int flagsPlaced;
-  private int minesFound;
+  private int flagsRemaining;
 
   private int height;
   private final int MIN_HEIGHT = 10;
@@ -35,8 +30,6 @@ public class Grid {
   public Grid(int height, int width, int mines) throws OutOfBoundsError, Exception {
     this.timeStarted = null;
     this.isFirstTurn = true;
-    this.flagsPlaced = 0;
-    this.minesFound = 0;
     this.isRunning = true;
     setHeight(height);
     setWidth(width);
@@ -44,17 +37,17 @@ public class Grid {
     setMines(mines);
     this.tiles = generateGrid(width, height, mines);
     calculateAllNearbyMines();
+    this.flagsRemaining = mines;
   }
 
   public void reset() throws OutOfBoundsError {
     this.timeStarted = null;
     this.isFirstTurn = true;
-    this.flagsPlaced = 0;
-    this.minesFound = 0;
     this.isRunning = true;
     this.tiles = null;
     this.tiles = generateGrid(width, height, mines);
     calculateAllNearbyMines();
+    this.flagsRemaining = mines;
   }
 
   private Tile[][] generateGrid(int width, int height, int mines) {
@@ -200,12 +193,8 @@ public class Grid {
     return this.isFirstTurn;
   }
 
-  public int getFlagsPlaced() {
-    return this.flagsPlaced;
-  }
-
-  public int getMinesFound() {
-    return this.minesFound;
+  public int getFlagsRemaining() {
+    return flagsRemaining;
   }
 
   public boolean isRunning() {
@@ -285,6 +274,10 @@ public class Grid {
     this.mines = mines;
   }
 
+  public void setFlagsRemaining(int flagsRemaining) {
+    this.flagsRemaining = flagsRemaining;
+  }
+
   private void revealAllTiles() {
     for (int i = 0; i < this.width; i++) {
       for (int j = 0; j < this.height; j++) {
@@ -323,4 +316,23 @@ public class Grid {
       }
     }
   }
+
+  public void checkWinCondition() {
+    if (areAllTilesRevealed() && isRunning) {
+      CommandUtils.endGame(true, this);
+    }
+  }
+
+  private boolean areAllTilesRevealed() {
+    for (int i = 0; i < this.width; i++) {
+      for (int j = 0; j < this.height; j++) {
+        if (!this.tiles[i][j].isRevealed()) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
 }

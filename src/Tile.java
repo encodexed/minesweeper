@@ -101,7 +101,20 @@ public class Tile {
     }
   }
 
-  public void setFlagged(boolean isFlagged) {
+  public void setFlagged(boolean isFlagged, Grid grid) {
+    // check if trying to add more flags than are remaining
+    if (grid.getFlagsRemaining() == 0 && isFlagged) {
+      System.out.println("No more flags remaining!");
+      return;
+    }
+
+    // update flags remaining value
+    if (isFlagged) {
+      grid.setFlagsRemaining(grid.getFlagsRemaining() - 1);
+    } else {
+      grid.setFlagsRemaining(grid.getFlagsRemaining() + 1);
+    }
+
     this.isFlagged = isFlagged;
   }
 

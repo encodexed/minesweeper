@@ -34,7 +34,6 @@ public class CommandUtils {
           // first turn should be safe
           if (grid.isFirstTurn()) {
             boolean isFirstTurnUnsafe = true;
-            // TODO: Re-roll until first turn lands on safe (zero) tile
             // the board will regenerate if the first turn is unsafe, then retry turn
             while (isFirstTurnUnsafe) {
               // attempting the turn
@@ -99,12 +98,14 @@ public class CommandUtils {
     int[] coords = convertCoordinatesToIntArray(coordinates);
     Tile targetTile = grid.getTileAt(coords[0], coords[1]);
 
+    // if trying to flag a revealed tile
     if (targetTile.isRevealed() && !targetTile.isFlagged()) {
       System.out.println("You can't flag a revealed tile!");
       return;
     }
 
-    targetTile.setFlagged(!targetTile.isFlagged());
+    // otherwise toggle flag on/off and revealed on/off
+    targetTile.setFlagged(!targetTile.isFlagged(), grid);
     boolean isRevealed = targetTile.isRevealed();
     targetTile.setRevealed(!isRevealed, true);
     grid.printGrid();
@@ -128,24 +129,29 @@ public class CommandUtils {
   private static boolean revealTile(String coordinates, Grid grid) throws OutOfBoundsError {
     int[] coords = convertCoordinatesToIntArray(coordinates);
     Tile targetTile = grid.getTileAt(coords[0], coords[1]);
+
     if (targetTile.isRevealed()) {
       System.out.println("That tile is already revealed or flagged!");
     } else {
       targetTile.setRevealed(true, grid.isRunning());
+      // report unsafe turn if nearby mines and first turn
       if (targetTile.getNearbyMines() > 0 && grid.isFirstTurn()) {
         return true;
       }
 
+      // report unsafe turn if first turn, or end game otherwise
       if (targetTile.getTileType() == TileType.MINE) {
         return true;
       }
 
+      // open lots of tiles if completely safe
       if (targetTile.getDisplayedValue().equals("[~]")) {
         grid.cascadeSafeReveals(coords[0], coords[1]);
         grid.printGrid();
       } else {
         grid.printGrid();
       }
+
     }
 
     return false;
@@ -155,14 +161,23 @@ public class CommandUtils {
   private static boolean handleTurn(String command, Grid grid) throws OutOfBoundsError {
     if (command.charAt(0) == '!') {
       togglePlacedFlag(command.substring(1), grid);
+      // Check if game is won
+      if (grid.getFlagsRemaining() == 0) {
+        grid.checkWinCondition();
+      }
       return false;
     } else {
       // Has the potential to end the game
-      return revealTile(command, grid);
+      boolean isGameOver = revealTile(command, grid);
+      // Check if game is won
+      if (grid.getFlagsRemaining() == 0) {
+        grid.checkWinCondition();
+      }
+      return isGameOver;
     }
   }
 
-  private static void endGame(boolean isOutcomeGood, Grid grid) {
+  public static void endGame(boolean isOutcomeGood, Grid grid) {
     grid.setIsRunning(false);
     grid.printGrid();
 
