@@ -93,7 +93,7 @@ public class CommandUtils {
     return String.format("Time taken: %02d:%02d", minutes, secondsLeft);
   }
 
-  private static void togglePlacedFlag(String coordinates, Grid grid) throws OutOfBoundsError {
+  private static void togglePlacedFlag(String coordinates, Grid grid) {
     int[] coords = convertCoordinatesToIntArray(coordinates);
     Tile targetTile = grid.getTileAt(coords[0], coords[1]);
 
@@ -133,7 +133,7 @@ public class CommandUtils {
   }
 
   // Returning true here triggers an end game condition
-  private static boolean revealTile(String coordinates, Grid grid) throws OutOfBoundsError {
+  private static boolean revealTile(String coordinates, Grid grid) {
     int[] coords = convertCoordinatesToIntArray(coordinates);
 
     // make sure coordinates aren't out of bounds
@@ -169,7 +169,7 @@ public class CommandUtils {
   }
 
   // Returning true here ends the game
-  private static boolean handleTurn(String command, Grid grid) throws OutOfBoundsError {
+  private static boolean handleTurn(String command, Grid grid) {
     if (command.charAt(0) == '!') {
       togglePlacedFlag(command.substring(1), grid);
       // Check if game is won

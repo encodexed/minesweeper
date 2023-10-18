@@ -1,7 +1,7 @@
 import java.util.Scanner;
 
 public class Main {
-  public static void main(String[] args) throws Exception {
+  public static void main(String[] args) throws OutOfBoundsError, Exception {
     System.out.println("Welcome to Java Minesweeper!");
     Grid grid = new Grid(10, 10, 15);
     CommandUtils.printHelp();

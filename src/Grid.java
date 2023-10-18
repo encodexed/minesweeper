@@ -15,6 +15,7 @@ public class Grid {
   private boolean isRunning;
   private int flagsRemaining;
   private ArrayList<Integer[]> flagLocations;
+  private int[][] mineLocations;
 
   private int height;
   private final int MIN_HEIGHT = 10;
@@ -46,7 +47,7 @@ public class Grid {
     this.flagLocations = new ArrayList<Integer[]>();
   }
 
-  public void reset() throws OutOfBoundsError {
+  public void reset() {
     this.timeStarted = null;
     this.isFirstTurn = true;
     this.isRunning = true;
@@ -63,8 +64,8 @@ public class Grid {
     Tile[][] grid = new Tile[width][height];
 
     // Generate locations of mines
-    int[][] mineLocations = generateMineLocations(width, height, mines);
-    System.out.println("Mine locations: " + Arrays.deepToString(mineLocations));
+    generateMineLocations(width, height, mines);
+    System.out.println("Mine locations: " + Arrays.deepToString(this.mineLocations));
 
     // Add mine tiles to the empty grid
     for (int i = 0; i < mineLocations.length; i++) {
@@ -85,7 +86,7 @@ public class Grid {
     return grid;
   }
 
-  private int[][] generateMineLocations(int width, int height, int mines) {
+  private void generateMineLocations(int width, int height, int mines) {
     // Create unique mine locations
     int totalTiles = width * height;
     HashSet<Integer> rawLocations = new HashSet<>(mines);
@@ -114,10 +115,10 @@ public class Grid {
       mineLocations[i][1] = rawLocationsArray[i] % height;
     }
 
-    return mineLocations;
+    this.mineLocations = mineLocations;
   }
 
-  private void calculateAllNearbyMines() throws OutOfBoundsError {
+  private void calculateAllNearbyMines() {
     for (int i = 0; i < this.width; i++) {
       for (int j = 0; j < this.height; j++) {
         this.tiles[i][j].setNearbyMines(calculateNearbyMines(i, j));
@@ -125,7 +126,7 @@ public class Grid {
     }
   }
 
-  private int calculateNearbyMines(int xLoc, int yLoc) throws OutOfBoundsError {
+  private int calculateNearbyMines(int xLoc, int yLoc) {
     int mineCounter = 0;
     // top left
     mineCounter += this.checkForMine(xLoc - 1, yLoc - 1);
@@ -147,7 +148,7 @@ public class Grid {
     return mineCounter;
   }
 
-  private int checkForMine(int xLoc, int yLoc) throws OutOfBoundsError {
+  private int checkForMine(int xLoc, int yLoc) {
     if (validateCoordinates(xLoc, yLoc)) {
       if (this.getTileAt(xLoc, yLoc).getTileType() == TileType.MINE) {
         return 1;
