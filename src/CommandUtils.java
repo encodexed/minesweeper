@@ -9,10 +9,9 @@ public class CommandUtils {
       case "new":
         grid.reset();
         System.out.println("Starting a new game");
-        grid.printGrid();
         return true;
       case "grid":
-        grid.printGrid();
+        // Do nothing (grid will print on next loop inside Main)
         return true;
       case "help":
         printHelp();
@@ -77,7 +76,7 @@ public class CommandUtils {
     System.out.println("------------------------------------");
   }
 
-  private static void printTimeTaken(Grid grid) {
+  public static void printTimeTaken(Grid grid) {
     if (grid.getTimeStarted() == null) {
       return;
     }
@@ -98,6 +97,12 @@ public class CommandUtils {
     int[] coords = convertCoordinatesToIntArray(coordinates);
     Tile targetTile = grid.getTileAt(coords[0], coords[1]);
 
+    // make sure coordinates aren't out of bounds
+    if (!grid.validateCoordinates(coords[0], coords[1])) {
+      System.out.println("Provided coordinates are out of bounds.");
+      return;
+    }
+
     // if trying to flag a revealed tile
     if (targetTile.isRevealed() && !targetTile.isFlagged()) {
       System.out.println("You can't flag a revealed tile!");
@@ -105,10 +110,11 @@ public class CommandUtils {
     }
 
     // otherwise toggle flag on/off and revealed on/off
-    targetTile.setFlagged(!targetTile.isFlagged(), grid);
-    boolean isRevealed = targetTile.isRevealed();
-    targetTile.setRevealed(!isRevealed, true);
-    grid.printGrid();
+    boolean allowedToFlag = targetTile.setFlagged(!targetTile.isFlagged(), grid, coords);
+    if (allowedToFlag) {
+      boolean isRevealed = targetTile.isRevealed();
+      targetTile.setRevealed(!isRevealed, true);
+    }
   }
 
   private static int[] convertCoordinatesToIntArray(String coordinates) {
@@ -116,6 +122,7 @@ public class CommandUtils {
     int x = lowerCaseX.charAt(0) - 97;
     int y = Integer.parseInt(coordinates.substring(1));
     int[] coords = { x, y };
+
     return coords;
   }
 
@@ -128,6 +135,13 @@ public class CommandUtils {
   // Returning true here triggers an end game condition
   private static boolean revealTile(String coordinates, Grid grid) throws OutOfBoundsError {
     int[] coords = convertCoordinatesToIntArray(coordinates);
+
+    // make sure coordinates aren't out of bounds
+    if (!grid.validateCoordinates(coords[0], coords[1])) {
+      System.out.println("Provided coordinates are out of bounds.");
+      return false;
+    }
+
     Tile targetTile = grid.getTileAt(coords[0], coords[1]);
 
     if (targetTile.isRevealed()) {
@@ -147,9 +161,6 @@ public class CommandUtils {
       // open lots of tiles if completely safe
       if (targetTile.getDisplayedValue().equals("[~]")) {
         grid.cascadeSafeReveals(coords[0], coords[1]);
-        grid.printGrid();
-      } else {
-        grid.printGrid();
       }
 
     }
@@ -179,6 +190,7 @@ public class CommandUtils {
 
   public static void endGame(boolean isOutcomeGood, Grid grid) {
     grid.setIsRunning(false);
+    System.out.println("############### GAME OVER ###############");
     grid.printGrid();
 
     if (isOutcomeGood) {

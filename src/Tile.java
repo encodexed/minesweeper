@@ -101,11 +101,11 @@ public class Tile {
     }
   }
 
-  public void setFlagged(boolean isFlagged, Grid grid) {
+  public boolean setFlagged(boolean isFlagged, Grid grid, int[] coords) {
     // check if trying to add more flags than are remaining
     if (grid.getFlagsRemaining() == 0 && isFlagged) {
       System.out.println("No more flags remaining!");
-      return;
+      return false;
     }
 
     // update flags remaining value
@@ -116,6 +116,20 @@ public class Tile {
     }
 
     this.isFlagged = isFlagged;
+    adjustFlagLocationsArray(coords, grid);
+    return true;
+  }
+
+  private void adjustFlagLocationsArray(int[] coords, Grid grid) {
+    // add/remove flag from flag locations list
+    Integer coordsInt0 = Integer.valueOf(coords[0]);
+    Integer coordsInt1 = Integer.valueOf(coords[1]);
+    Integer[] coordsIntArr = { coordsInt0, coordsInt1 };
+    if (this.isFlagged()) {
+      grid.addToFlagLocations(coordsIntArr);
+    } else {
+      grid.removeFromFlagLocations(coordsIntArr);
+    }
   }
 
   public void setDisplayedValue(String displayedValue) {

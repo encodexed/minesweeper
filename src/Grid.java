@@ -1,7 +1,11 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Grid {
 
@@ -10,6 +14,7 @@ public class Grid {
   private boolean isFirstTurn;
   private boolean isRunning;
   private int flagsRemaining;
+  private ArrayList<Integer[]> flagLocations;
 
   private int height;
   private final int MIN_HEIGHT = 10;
@@ -38,6 +43,7 @@ public class Grid {
     this.tiles = generateGrid(width, height, mines);
     calculateAllNearbyMines();
     this.flagsRemaining = mines;
+    this.flagLocations = new ArrayList<Integer[]>();
   }
 
   public void reset() throws OutOfBoundsError {
@@ -48,6 +54,7 @@ public class Grid {
     this.tiles = generateGrid(width, height, mines);
     calculateAllNearbyMines();
     this.flagsRemaining = mines;
+    this.flagLocations = new ArrayList<Integer[]>();
   }
 
   private Tile[][] generateGrid(int width, int height, int mines) {
@@ -150,7 +157,7 @@ public class Grid {
     return 0;
   }
 
-  private boolean validateCoordinates(int x, int y) {
+  public boolean validateCoordinates(int x, int y) {
     if (x < 0 || x > this.width - 1) {
       return false;
     }
@@ -197,6 +204,10 @@ public class Grid {
     return flagsRemaining;
   }
 
+  public ArrayList<Integer[]> getFlagLocations() {
+    return flagLocations;
+  }
+
   public boolean isRunning() {
     return isRunning;
   }
@@ -222,9 +233,28 @@ public class Grid {
     return this.tiles[x][y];
   }
 
+  public int getFlagLocationsSize() {
+    return this.flagLocations.size();
+  }
+
   // Setters
   public void setFirstTurn(boolean isFirstTurn) {
     this.isFirstTurn = isFirstTurn;
+  }
+
+  public void addToFlagLocations(Integer[] coords) {
+    this.flagLocations.add(coords);
+    System.out.println("Flag location added.");
+  }
+
+  public void removeFromFlagLocations(Integer[] coords) {
+    Stream<Integer[]> filteredLocations = this.flagLocations.stream().filter((flagLocs) -> {
+      return (flagLocs[0] != coords[0] || flagLocs[1] != coords[1]);
+    });
+
+    List<Integer[]> locationsList = filteredLocations.collect(Collectors.toList());
+    this.flagLocations = new ArrayList<Integer[]>(locationsList);
+    System.out.println("Flag location removed.");
   }
 
   public void startTimer() {
