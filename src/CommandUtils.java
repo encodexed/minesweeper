@@ -10,12 +10,11 @@ public class CommandUtils {
         grid.reset();
         System.out.println("Starting a new game");
         return true;
-      case "grid":
-        // Do nothing (grid will print on next loop inside Main)
-        return true;
+
       case "help":
         printHelp();
         return true;
+
       case "time":
         if (grid.getTimeStarted() == null) {
           System.out.println("Timer not started yet.");
@@ -23,9 +22,11 @@ public class CommandUtils {
           printTimeTaken(grid);
         }
         return true;
+
       case "quit":
         System.out.println("Quitting the game. Thanks for playing!");
         return false;
+
       default:
         boolean validated = validateCoordinatesCommand(command);
         // if coordinates match regex
@@ -66,14 +67,13 @@ public class CommandUtils {
   public static void printHelp() {
     System.out.println("------------------------------------");
     System.out.println("Here are the accepted command patterns");
-    System.out.println("'new' : Begins a new game.");
-    System.out.println("'grid' : Displays the grid.");
     System.out.println("'a9' : Reveals A9");
     System.out.println("'!c4' : Toggles flagging C4");
+    System.out.println("'new' : Begins a new game.");
     System.out.println("'help' : Displays this list of commands.");
     System.out.println("'time' : Displays the current time taken.");
     System.out.println("'quit' : Quits the game.");
-    System.out.println("------------------------------------");
+    System.out.print("------------------------------------");
   }
 
   public static void printTimeTaken(Grid grid) {
@@ -189,18 +189,23 @@ public class CommandUtils {
   }
 
   public static void endGame(boolean isOutcomeGood, Grid grid) {
+    int revealedTiles = grid.getRevealedTilesCount();
     grid.setIsRunning(false);
-    System.out.println("############### GAME OVER ###############");
-    grid.printGrid();
 
     if (isOutcomeGood) {
-      System.out.println("Congratulations! You beat the game and found all of the mines safely.");
+      System.out.println("\n################### YOU WON ###################");
+      grid.printGrid();
+      System.out.println("###############################################\n");
+      System.out.println("Congratulations! You beat the game and flagged all of the mines safely.");
     } else {
+      System.out.println("\n#################### OH NO ####################");
+      grid.printGrid();
+      System.out.println("###############################################\n");
       System.out.println("Oh no! You stepped on a mine... Better luck next time.");
     }
 
     printTimeTaken(grid);
-    System.out.println("Mines successfully flagged: __");
-    System.out.println("Tiles revealed: __ / __ (__%)");
+    System.out.println("Mines successfully flagged: " + grid.minesCorrectlyFlagged());
+    System.out.println(String.format("Tiles revealed: %d/%d", revealedTiles, grid.getTotalTiles()));
   }
 }

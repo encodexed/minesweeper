@@ -171,6 +171,7 @@ public class Grid {
   }
 
   public void printGrid() {
+
     printXReference();
 
     for (int i = 0; i < this.height; i++) {
@@ -193,6 +194,10 @@ public class Grid {
   }
 
   // Getters
+  public int getTotalTiles() {
+    return this.width * this.height;
+  }
+
   public Date getTimeStarted() {
     return this.timeStarted;
   }
@@ -348,22 +353,43 @@ public class Grid {
     }
   }
 
-  public void checkWinCondition() {
-    if (areAllTilesRevealed() && isRunning) {
-      CommandUtils.endGame(true, this);
-    }
-  }
+  public int minesCorrectlyFlagged() {
+    int minesCorrectlyFlagged = 0;
 
-  private boolean areAllTilesRevealed() {
-    for (int i = 0; i < this.width; i++) {
-      for (int j = 0; j < this.height; j++) {
-        if (!this.tiles[i][j].isRevealed()) {
-          return false;
+    for (Integer[] flagLoc : this.flagLocations) {
+      int fX = flagLoc[0];
+      int fY = flagLoc[1];
+
+      for (int[] mineLoc : this.mineLocations) {
+        int mX = mineLoc[0];
+        int mY = mineLoc[1];
+        if (fX == mX && fY == mY) {
+          minesCorrectlyFlagged++;
         }
       }
     }
 
-    return true;
+    return minesCorrectlyFlagged;
+  }
+
+  public void checkWinCondition() {
+    if (this.getRevealedTilesCount() == this.getTotalTiles() && isRunning) {
+      CommandUtils.endGame(true, this);
+    }
+  }
+
+  public int getRevealedTilesCount() {
+    int revealedTiles = 0;
+
+    for (int i = 0; i < this.width; i++) {
+      for (int j = 0; j < this.height; j++) {
+        if (this.tiles[i][j].isRevealed()) {
+          revealedTiles++;
+        }
+      }
+    }
+
+    return revealedTiles;
   }
 
 }
