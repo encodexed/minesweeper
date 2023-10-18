@@ -1,5 +1,5 @@
 import java.util.ArrayList;
-import java.util.Arrays;
+// import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -65,7 +65,8 @@ public class Grid {
 
     // Generate locations of mines
     generateMineLocations(width, height, mines);
-    System.out.println("Mine locations: " + Arrays.deepToString(this.mineLocations));
+    // System.out.println("Mine locations: " +
+    // Arrays.deepToString(this.mineLocations));
 
     // Add mine tiles to the empty grid
     for (int i = 0; i < mineLocations.length; i++) {
