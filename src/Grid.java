@@ -1,6 +1,4 @@
 import java.util.ArrayList;
-// import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -10,9 +8,6 @@ import java.util.stream.Stream;
 public class Grid {
 
   // Metadata
-  private Date timeStarted;
-  private boolean isFirstTurn;
-  private boolean isRunning;
   private int flagsRemaining;
   private ArrayList<Integer[]> flagLocations;
   private int[][] mineLocations;
@@ -34,24 +29,10 @@ public class Grid {
 
   // Constructor
   public Grid(int height, int width, int mines) throws OutOfBoundsError, Exception {
-    this.timeStarted = null;
-    this.isFirstTurn = true;
-    this.isRunning = true;
     setHeight(height);
     setWidth(width);
     this.maxMines = (width - 1) * (height - 1);
     setMines(mines);
-    this.tiles = generateGrid(width, height, mines);
-    calculateAllNearbyMines();
-    this.flagsRemaining = mines;
-    this.flagLocations = new ArrayList<Integer[]>();
-  }
-
-  public void reset() {
-    this.timeStarted = null;
-    this.isFirstTurn = true;
-    this.isRunning = true;
-    this.tiles = null;
     this.tiles = generateGrid(width, height, mines);
     calculateAllNearbyMines();
     this.flagsRemaining = mines;
@@ -199,24 +180,12 @@ public class Grid {
     return this.width * this.height;
   }
 
-  public Date getTimeStarted() {
-    return this.timeStarted;
-  }
-
-  public boolean isFirstTurn() {
-    return this.isFirstTurn;
-  }
-
   public int getFlagsRemaining() {
     return flagsRemaining;
   }
 
   public ArrayList<Integer[]> getFlagLocations() {
     return flagLocations;
-  }
-
-  public boolean isRunning() {
-    return isRunning;
   }
 
   public int getHeight() {
@@ -245,9 +214,6 @@ public class Grid {
   }
 
   // Setters
-  public void setFirstTurn(boolean isFirstTurn) {
-    this.isFirstTurn = isFirstTurn;
-  }
 
   public void addToFlagLocations(Integer[] coords) {
     this.flagLocations.add(coords);
@@ -262,17 +228,6 @@ public class Grid {
     List<Integer[]> locationsList = filteredLocations.collect(Collectors.toList());
     this.flagLocations = new ArrayList<Integer[]>(locationsList);
     System.out.println("Flag location removed.");
-  }
-
-  public void startTimer() {
-    this.timeStarted = new Date();
-  }
-
-  public void setIsRunning(boolean isRunning) {
-    this.isRunning = isRunning;
-    if (!isRunning) {
-      revealAllTiles();
-    }
   }
 
   public void setHeight(int height) throws OutOfBoundsError {
@@ -315,40 +270,40 @@ public class Grid {
     this.flagsRemaining = flagsRemaining;
   }
 
-  private void revealAllTiles() {
+  public void revealAllTiles() {
     for (int i = 0; i < this.width; i++) {
       for (int j = 0; j < this.height; j++) {
-        this.tiles[i][j].setRevealed(true, this.isRunning);
+        this.tiles[i][j].setRevealed(true, false);
       }
     }
   }
 
-  public void cascadeSafeReveals(int xLoc, int yLoc) {
+  public void cascadeSafeReveals(int xLoc, int yLoc, Game game) {
     // top left
-    handleCascade(xLoc - 1, yLoc - 1);
+    handleCascade(xLoc - 1, yLoc - 1, game);
     // top
-    handleCascade(xLoc, yLoc - 1);
+    handleCascade(xLoc, yLoc - 1, game);
     // // top right
-    handleCascade(xLoc + 1, yLoc - 1);
+    handleCascade(xLoc + 1, yLoc - 1, game);
     // // right
-    handleCascade(xLoc + 1, yLoc);
+    handleCascade(xLoc + 1, yLoc, game);
     // // bottom right
-    handleCascade(xLoc + 1, yLoc + 1);
+    handleCascade(xLoc + 1, yLoc + 1, game);
     // // bottom
-    handleCascade(xLoc, yLoc + 1);
+    handleCascade(xLoc, yLoc + 1, game);
     // // bottom left
-    handleCascade(xLoc - 1, yLoc + 1);
+    handleCascade(xLoc - 1, yLoc + 1, game);
     // // left
-    handleCascade(xLoc - 1, yLoc);
+    handleCascade(xLoc - 1, yLoc, game);
   }
 
-  private void handleCascade(int xLoc, int yLoc) {
+  private void handleCascade(int xLoc, int yLoc, Game game) {
     if (validateCoordinates(xLoc, yLoc)) {
       Tile tile = getTileAt(xLoc, yLoc);
       if (!tile.isRevealed()) {
-        tile.setRevealed(true, this.isRunning);
+        tile.setRevealed(true, game.isRunning());
         if (tile.getNearbyMines() == 0) {
-          this.cascadeSafeReveals(xLoc, yLoc);
+          this.cascadeSafeReveals(xLoc, yLoc, game);
         }
       }
     }
@@ -371,12 +326,6 @@ public class Grid {
     }
 
     return minesCorrectlyFlagged;
-  }
-
-  public void checkWinCondition() {
-    if (this.getRevealedTilesCount() == this.getTotalTiles() && isRunning) {
-      CommandUtils.endGame(true, this);
-    }
   }
 
   public int getRevealedTilesCount() {

@@ -4,10 +4,10 @@ import java.util.regex.Pattern;
 
 public class CommandUtils {
 
-  public static boolean processCommand(String command, Grid grid) throws OutOfBoundsError, Exception {
+  public static boolean processCommand(String command, Game game) throws OutOfBoundsError, Exception {
     switch (command) {
       case "new":
-        grid.reset();
+        game.reset(10, 10, 15);
         System.out.println("Starting a new game");
         return true;
 
@@ -16,10 +16,10 @@ public class CommandUtils {
         return true;
 
       case "time":
-        if (grid.getTimeStarted() == null) {
+        if (game.getTimeStarted() == null) {
           System.out.println("Timer not started yet.");
         } else {
-          printTimeTaken(grid);
+          printTimeTaken(game);
         }
         return true;
 
@@ -28,39 +28,47 @@ public class CommandUtils {
         return false;
 
       default:
-        boolean validated = validateCoordinatesCommand(command);
-        // if coordinates match regex
-        if (validated) {
-          // first turn should be safe
-          if (grid.isFirstTurn()) {
-            boolean isFirstTurnUnsafe = true;
-            // the board will regenerate if the first turn is unsafe, then retry turn
-            while (isFirstTurnUnsafe) {
-              // attempting the turn
-              if (handleTurn(command, grid)) {
-                // unsafe turn, resetting the grid, looping around again
-                grid.reset();
-              } else {
-                // safe turn, starting timer, ending loop
-                grid.startTimer();
-                grid.setFirstTurn(false);
-                isFirstTurnUnsafe = false;
-              }
+        return handleCommand(command, game);
+    }
+  }
+
+  private static boolean handleCommand(String command, Game game) {
+    boolean validated = validateCoordinatesCommand(command);
+    // if coordinates match regex
+    if (validated) {
+      // first turn should be safe
+      if (game.isFirstTurn()) {
+        boolean isFirstTurnUnsafe = true;
+        // the board will regenerate if the first turn is unsafe, then retry turn
+        while (isFirstTurnUnsafe) {
+          // attempting the turn
+          if (handleTurn(command, game)) {
+            // unsafe turn, resetting the grid, looping around again
+            try {
+              game.reset(10, 10, 15);
+            } catch (Exception e) {
+              System.out.println(e.getMessage());
             }
-            return true;
           } else {
-            // every other turn besides the first, this could end the game
-            boolean isGameOver = handleTurn(command, grid);
-            if (isGameOver) {
-              endGame(false, grid);
-            }
-            return true;
+            // safe turn, starting timer, ending loop
+            game.startTimer();
+            game.setFirstTurn(false);
+            isFirstTurnUnsafe = false;
           }
-        } else {
-          // coords/command didn't match regex
-          System.out.println("Invalid command");
-          return true;
         }
+        return true;
+      } else {
+        // every other turn besides the first, this could end the game
+        boolean isGameOver = handleTurn(command, game);
+        if (isGameOver) {
+          endGame(false, game);
+        }
+        return true;
+      }
+    } else {
+      // coords/command didn't match regex
+      System.out.println("Invalid command");
+      return true;
     }
   }
 
@@ -76,12 +84,13 @@ public class CommandUtils {
     System.out.print("------------------------------------");
   }
 
-  public static void printTimeTaken(Grid grid) {
-    if (grid.getTimeStarted() == null) {
+  public static void printTimeTaken(Game game) {
+    if (game.getTimeStarted() == null) {
       return;
     }
+
     Date now = new Date();
-    Date startedAt = grid.getTimeStarted();
+    Date startedAt = game.getTimeStarted();
     long millisecondsTaken = now.getTime() - startedAt.getTime();
     System.out.println(timeTakenFormatted(millisecondsTaken));
   }
@@ -133,7 +142,7 @@ public class CommandUtils {
   }
 
   // Returning true here triggers an end game condition
-  private static boolean revealTile(String coordinates, Grid grid) {
+  private static boolean revealTile(String coordinates, Grid grid, Game game) {
     int[] coords = convertCoordinatesToIntArray(coordinates);
 
     // make sure coordinates aren't out of bounds
@@ -147,9 +156,9 @@ public class CommandUtils {
     if (targetTile.isRevealed()) {
       System.out.println("That tile is already revealed or flagged!");
     } else {
-      targetTile.setRevealed(true, grid.isRunning());
+      targetTile.setRevealed(true, game.isRunning());
       // report unsafe turn if nearby mines and first turn
-      if (targetTile.getNearbyMines() > 0 && grid.isFirstTurn()) {
+      if (targetTile.getNearbyMines() > 0 && game.isFirstTurn()) {
         return true;
       }
 
@@ -160,7 +169,7 @@ public class CommandUtils {
 
       // open lots of tiles if completely safe
       if (targetTile.getDisplayedValue().equals("[~]")) {
-        grid.cascadeSafeReveals(coords[0], coords[1]);
+        grid.cascadeSafeReveals(coords[0], coords[1], game);
       }
 
     }
@@ -169,28 +178,30 @@ public class CommandUtils {
   }
 
   // Returning true here ends the game
-  private static boolean handleTurn(String command, Grid grid) {
+  private static boolean handleTurn(String command, Game game) {
+    Grid grid = game.getGrid();
     if (command.charAt(0) == '!') {
       togglePlacedFlag(command.substring(1), grid);
       // Check if game is won
       if (grid.getFlagsRemaining() == 0) {
-        grid.checkWinCondition();
+        game.checkWinCondition();
       }
       return false;
     } else {
       // Has the potential to end the game
-      boolean isGameOver = revealTile(command, grid);
+      boolean isGameOver = revealTile(command, grid, game);
       // Check if game is won
       if (grid.getFlagsRemaining() == 0) {
-        grid.checkWinCondition();
+        game.checkWinCondition();
       }
       return isGameOver;
     }
   }
 
-  public static void endGame(boolean isOutcomeGood, Grid grid) {
+  public static void endGame(boolean isOutcomeGood, Game game) {
+    Grid grid = game.getGrid();
     int revealedTiles = grid.getRevealedTilesCount();
-    grid.setIsRunning(false);
+    game.setRunning(false);
 
     if (isOutcomeGood) {
       System.out.println("\n################### YOU WON ###################");
@@ -204,7 +215,7 @@ public class CommandUtils {
       System.out.println("Oh no! You stepped on a mine... Better luck next time.");
     }
 
-    printTimeTaken(grid);
+    printTimeTaken(game);
     System.out.println("Mines successfully flagged: " + grid.minesCorrectlyFlagged());
     System.out.println(String.format("Tiles revealed: %d/%d", revealedTiles, grid.getTotalTiles()));
   }
