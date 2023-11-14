@@ -2,7 +2,7 @@
 
 ## Demo & Snippets
 
-Image goes here
+![JavaMinesweeperCLI](https://github.com/encodexed/minesweeper/assets/107448691/8fa898d7-f910-4ff6-b57c-df7ca7e09a49)
 
 ---
 
